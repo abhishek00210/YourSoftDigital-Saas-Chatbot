@@ -322,6 +322,23 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           30% { transform: translateY(-10px); }
         }
 
+        .chatbot-footer {
+          padding: 8px 16px;
+          text-align: center;
+          font-size: 12px;
+          background-color: #f9fafb;
+          border-top: 1px solid #e2e8f0;
+        }
+
+        .chatbot-footer a {
+          color: #3b82f6;
+          text-decoration: none;
+        }
+
+        .chatbot-footer a:hover {
+          text-decoration: underline;
+        }
+
         @media (max-width: 480px) {
           .chatbot-window {
             width: calc(100vw - 40px);
@@ -361,6 +378,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           <div class="chatbot-input-area">
             <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Type your message...">
             <button class="chatbot-send" id="chatbot-send">Send</button>
+          </div>
+          <div class="chatbot-footer">
+            Powered by <a href="https://yoursoftdigital.ca/" target="_blank" rel="noopener noreferrer">yoursoftdigital.ca</a>
           </div>
         </div>
       \`;

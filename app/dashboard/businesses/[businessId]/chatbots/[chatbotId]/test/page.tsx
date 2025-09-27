@@ -330,6 +330,10 @@ export default function TestChatPage({ params }: TestChatPageProps) {
                 </Button>
               </div>
             </div>
+            
+            <div className="p-2 text-center text-xs text-gray-500 border-t bg-gray-50">
+              Powered by <a href="https://yoursoftdigital.ca" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">YourSoft Digital</a>
+            </div>
           </Card>
 
           {/* Test Instructions */}
