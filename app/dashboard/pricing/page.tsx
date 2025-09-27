@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser } from "@/lib/utils/database"
+import { getUserSubscription } from "@/lib/utils/subscriptions"
 import {
   Card,
   CardContent,
@@ -23,10 +25,14 @@ export default async function PricingPage() {
     redirect("/auth/login")
   }
 
+  const user = await getCurrentUser()
+  const { data: subscription } = user ? await getUserSubscription(user.id) : { data: null }
+  const currentPlanName = subscription?.prices?.products?.name || "Free Plan"
+
   const plans = [
     {
       id: "price_free",
-      name: "Free",
+      name: "Free Plan",
       price: "$0",
       description: "Get a feel for our platform",
       features: [
@@ -41,7 +47,7 @@ export default async function PricingPage() {
     },
     {
       id: "price_basic_29",
-      name: "Basic",
+      name: "Basic Plan",
       price: "$29",
       description: "For small to medium businesses",
       features: [
@@ -57,7 +63,7 @@ export default async function PricingPage() {
     },
     {
       id: "pro_plan_49",
-      name: "Pro",
+      name: "Pro Plan",
       price: "$49",
       description: "For businesses at scale",
       features: [
@@ -86,7 +92,7 @@ export default async function PricingPage() {
 
       <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
         {plans.map((plan) => (
-          <Card key={plan.id} className="flex flex-col">
+          <Card key={plan.id} className={`flex flex-col ${plan.name === currentPlanName ? "border-blue-600" : ""}`}>
             <CardHeader>
               <CardTitle>{plan.name}</CardTitle>
               <CardDescription>{plan.description}</CardDescription>
@@ -114,9 +120,15 @@ export default async function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button asChild size="lg" className="w-full">
-                <Link href={plan.href}>{plan.cta}</Link>
-              </Button>
+              {plan.name === currentPlanName ? (
+                <Button size="lg" className="w-full" disabled>
+                  You are using {plan.name}
+                </Button>
+              ) : (
+                <Button asChild size="lg" className="w-full">
+                  <Link href={plan.href}>{plan.cta}</Link>
+                </Button>
+              )}
             </CardFooter>
           </Card>
         ))}
