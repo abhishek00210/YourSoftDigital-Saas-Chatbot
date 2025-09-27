@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser } from "@/lib/utils/database"
-import { getUserSubscription } from "@/lib/utils/subscriptions" // Import the subscription utility
+import { getUserSubscription } from "@/lib/utils/subscriptions"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Code, ExternalLink, CheckCircle, Key } from "lucide-react"
+import { ArrowLeft, Code, CheckCircle, Key } from "lucide-react"
 import Link from "next/link"
 import { CopyButton } from "@/components/ui/copy-button"
 
@@ -27,14 +27,6 @@ export default async function EmbedPage({ params }: EmbedPageProps) {
   if (!user) {
     redirect("/auth/login")
   }
-
-  // --- START: ADDED SUBSCRIPTION CHECK ---
-  const { data: subscription } = await getUserSubscription(user.id)
-
-  if (!subscription) {
-    redirect("/dashboard/pricing")
-  }
-  // --- END: ADDED SUBSCRIPTION CHECK ---
 
   // Get chatbot with business info
   const { data: chatbot, error } = await supabase
@@ -62,43 +54,11 @@ export default async function EmbedPage({ params }: EmbedPageProps) {
     process.env.NEXT_PUBLIC_APP_URL || "https://your-domain.com"
   }/api/widget/${chatbotId}" async></script>`
 
-  const htmlExample = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-</head>
-<body>
-    <h1>Welcome to My Store</h1>
-    <p>Browse our products and get help from our AI assistant!</p>
-    
-    ${embedCode}
-</body>
-</html>`
-
-  const wordpressInstructions = `1. Log in to your WordPress admin dashboard
-2. Go to Appearance → Theme Editor
-3. Select your active theme
-4. Open the footer.php file
-5. Add the embed code before the closing </body> tag
-6. Click "Update File"
-
-Alternatively, you can use a plugin like "Insert Headers and Footers" to add the code without editing theme files.`
-
-  const shopifyInstructions = `1. From your Shopify admin, go to Online Store → Themes
-2. Click "Actions" → "Edit code" for your active theme
-3. Open the theme.liquid file in the Layout folder
-4. Add the embed code before the closing </body> tag
-5. Click "Save"
-
-The chatbot will now appear on all pages of your store.`
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
+      {/* Header is handled by layout */}
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex items-center gap-4">
             <Link
               href={`/dashboard/businesses/${businessId}/chatbots/${chatbotId}`}
@@ -116,12 +76,7 @@ The chatbot will now appear on all pages of your store.`
               </div>
             </div>
           </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-8">
+          
           {/* Status Check card */}
           <Card>
             <CardHeader>
@@ -167,7 +122,7 @@ The chatbot will now appear on all pages of your store.`
             </CardContent>
           </Card>
 
-          {/* New Card for Chatbot ID */}
+          {/* Card for Chatbot ID */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

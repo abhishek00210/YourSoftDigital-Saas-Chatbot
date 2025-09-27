@@ -4,7 +4,8 @@ import { getCurrentUser } from "@/lib/utils/database"
 import { getUserSubscription } from "@/lib/utils/subscriptions"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { Badge } from "@/components/ui/badge"
-import { Bot } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Bot, Zap } from "lucide-react"
 import Link from "next/link"
 
 export default async function DashboardLayout({
@@ -26,8 +27,10 @@ export default async function DashboardLayout({
   const user = await getCurrentUser()
   const { data: subscription } = user ? await getUserSubscription(user.id) : { data: null }
 
+  const planName = subscription?.prices?.products?.name || "Free Plan"
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -35,13 +38,25 @@ export default async function DashboardLayout({
             <span className="text-xl font-bold text-gray-900">YourSoftDigital</span>
           </Link>
           <div className="flex items-center gap-4">
-            {subscription?.status === 'active' && <Badge variant="secondary">Pro User</Badge>}
-            <span className="text-sm text-gray-600">Welcome, {user?.full_name || authUser.email}</span>
+            <Badge
+              variant={planName === "Pro Plan" ? "default" : planName === "Basic Plan" ? "secondary" : "outline"}
+            >
+              {planName}
+            </Badge>
+            <span className="text-sm text-gray-600 hidden sm:block">Welcome, {user?.full_name || authUser.email}</span>
+            {planName !== "Pro Plan" && (
+              <Button asChild size="sm">
+                <Link href="/dashboard/pricing">
+                  <Zap className="h-4 w-4 mr-2" />
+                  Upgrade Plan
+                </Link>
+              </Button>
+            )}
             <LogoutButton />
           </div>
         </div>
       </header>
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
       <footer className="bg-gray-900 text-white py-12 px-4">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-4 gap-8">

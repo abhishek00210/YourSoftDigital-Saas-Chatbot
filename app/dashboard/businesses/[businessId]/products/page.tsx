@@ -38,7 +38,7 @@ export default function ProductsPage({ params }: ProductsPageProps) {
         redirect("/auth/login")
       }
 
-      const { data: businessData, error: businessError } = await supabase
+      const { data: businessData, error: businessError } = await (await supabase)
         .from("businesses")
         .select("*")
         .eq("id", businessId)
@@ -51,7 +51,7 @@ export default function ProductsPage({ params }: ProductsPageProps) {
 
       setBusiness(businessData)
 
-      let query = supabase
+      let query = (await supabase)
         .from("products")
         .select("*")
         .eq("business_id", businessId)
