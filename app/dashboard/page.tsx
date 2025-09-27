@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser, getUserBusinesses } from "@/lib/utils/database"
+import { getUserSubscription } from "@/lib/utils/subscriptions"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Plus, Bot, Building2, BarChart3 } from "lucide-react"
 import Link from "next/link"
 
@@ -21,6 +23,7 @@ export default async function DashboardPage() {
 
   const user = await getCurrentUser()
   const businesses = user ? await getUserBusinesses(user.id) : []
+  const { data: subscription } = user ? await getUserSubscription(user.id) : { data: null }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -32,6 +35,7 @@ export default async function DashboardPage() {
             <span className="text-xl font-bold text-gray-900">YourSoftDigital</span>
           </div>
           <div className="flex items-center gap-4">
+            {subscription?.status === 'active' && <Badge variant="secondary">Pro User</Badge>}
             <span className="text-sm text-gray-600">Welcome, {user?.full_name || authUser.email}</span>
             <LogoutButton />
           </div>
