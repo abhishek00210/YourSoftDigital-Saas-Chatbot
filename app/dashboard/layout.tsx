@@ -42,6 +42,92 @@ export default async function DashboardLayout({
         </div>
       </header>
       <main>{children}</main>
+      <footer className="bg-gray-900 text-white py-12 px-4">
+        <div className="container mx-auto">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Bot className="h-6 w-6" />
+                <span className="text-lg font-bold">YourSoftDigital</span>
+              </div>
+              <p className="text-gray-400">AI-powered chatbots for eCommerce businesses</p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <Link href="/features" className="hover:text-white">
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/pricing" className="hover:text-white">
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/demo" className="hover:text-white">
+                    Demo
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <Link href="/docs" className="hover:text-white">
+                    Documentation
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/help" className="hover:text-white">
+                    Help Center
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:text-white">
+                    Contact
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <Link href="/about" className="hover:text-white">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="hover:text-white">
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-white">
+                    Terms
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 YourSoftDigital. All rights reserved.</p>
+            <p className="mt-2">
+              <a
+                href="https://yoursoftdigital.ca/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 underline"
+              >
+                Powered by YourSoftDigital
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
