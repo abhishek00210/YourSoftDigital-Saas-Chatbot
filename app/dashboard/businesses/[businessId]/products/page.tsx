@@ -1,5 +1,3 @@
-"use client"
-
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser } from "@/lib/utils/database"
@@ -11,94 +9,64 @@ import { ArrowLeft, Package, RefreshCw, Search, ExternalLink } from "lucide-reac
 import Link from "next/link"
 import { ProductSyncButton } from "@/components/products/product-sync-button"
 import { ProductCard } from "@/components/products/product-card"
-import { useState, useEffect } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
 
 interface ProductsPageProps {
   params: { businessId: string }
+  searchParams: { search?: string; category?: string }
 }
 
-export default function ProductsPage({ params }: ProductsPageProps) {
+export default async function ProductsPage({ params, searchParams }: ProductsPageProps) {
   const { businessId } = params
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const [products, setProducts] = useState<any[]>([])
-  const [business, setBusiness] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "")
-  const [category, setCategory] = useState(searchParams.get("category") || "")
+  const { search, category } = searchParams
+  const supabase = await createClient()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true)
-      const supabase = createClient()
-      const user = await getCurrentUser()
-
-      if (!user) {
-        redirect("/auth/login")
-      }
-
-      const { data: businessData, error: businessError } = await (await supabase)
-        .from("businesses")
-        .select("*")
-        .eq("id", businessId)
-        .eq("user_id", user.id)
-        .single()
-
-      if (businessError || !businessData) {
-        redirect("/dashboard")
-      }
-
-      setBusiness(businessData)
-
-      let query = (await supabase)
-        .from("products")
-        .select("*")
-        .eq("business_id", businessId)
-        .order("created_at", { ascending: false })
-
-      if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
-      }
-
-      const { data: productsData, error: productsError } = await query
-      setProducts(productsData || [])
-      setIsLoading(false)
-    }
-
-    fetchData()
-  }, [businessId, searchTerm, category])
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearchTerm = e.target.value
-    setSearchTerm(newSearchTerm)
-    const params = new URLSearchParams(searchParams)
-    if (newSearchTerm) {
-      params.set("search", newSearchTerm)
-    } else {
-      params.delete("search")
-    }
-    router.replace(`/dashboard/businesses/${businessId}/products?${params.toString()}`)
+  const user = await getCurrentUser()
+  if (!user) {
+    redirect("/auth/login")
   }
 
+  // Get business details
+  const { data: business, error } = await supabase
+    .from("businesses")
+    .select("*")
+    .eq("id", businessId)
+    .eq("user_id", user.id)
+    .single()
+
+  if (error || !business) {
+    redirect("/dashboard")
+  }
+
+  // Get products with optional filtering
+  let query = supabase
+    .from("products")
+    .select("*")
+    .eq("business_id", businessId)
+    .order("created_at", { ascending: false })
+
+  if (search) {
+    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,sku.ilike.%${search}%`)
+  }
+
+  const { data: products = [], error: productsError } = await query
+
+  // Get unique categories for filtering
   const categories = [...new Set(products.flatMap((p) => p.categories || []))].filter(Boolean)
-  const filteredProducts = category ? products.filter((p) => p.categories?.includes(category)) : products
-  const hasWooCommerceConfig = !!(
-    business?.woocommerce_url &&
-    business?.woocommerce_consumer_key &&
-    business?.woocommerce_consumer_secret
-  )
 
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
+  // Filter by category if specified
+  const filteredProducts = category ? products.filter((p) => p.categories?.includes(category)) : products
+
+  const hasWooCommerceConfig = !!(
+    business.woocommerce_url &&
+    business.woocommerce_consumer_key &&
+    business.woocommerce_consumer_secret
+  )
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+      {/* Header is handled by layout */}
+      <main className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Link href={`/dashboard/businesses/${businessId}`}>
                 <Button variant="ghost" size="sm">
@@ -121,11 +89,6 @@ export default function ProductsPage({ params }: ProductsPageProps) {
               </Link>
             </div>
           </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -206,10 +169,10 @@ export default function ProductsPage({ params }: ProductsPageProps) {
           <>
             {/* Search and Filters */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <div className="relative flex-1">
+              <form className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input placeholder="Search products..." className="pl-10" value={searchTerm} onChange={handleSearch} />
-              </div>
+                <Input placeholder="Search products..." className="pl-10" name="search" defaultValue={search} />
+              </form>
               {categories.length > 0 && (
                 <div className="flex gap-2 flex-wrap">
                   <Link href={`/dashboard/businesses/${businessId}/products`}>
@@ -238,7 +201,7 @@ export default function ProductsPage({ params }: ProductsPageProps) {
               ))}
             </div>
 
-            {filteredProducts.length === 0 && (searchTerm || category) && (
+            {filteredProducts.length === 0 && (search || category) && (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Search className="h-12 w-12 text-gray-400 mb-4" />
