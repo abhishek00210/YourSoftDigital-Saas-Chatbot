@@ -2,22 +2,27 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getUserSubscription } from "@/lib/utils/subscriptions"
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ chatbotId: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { chatbotId: string } }
+) {
   try {
-    const { chatbotId } = await params
+    const { chatbotId } = params
     const supabase = await createClient()
 
     // Get chatbot configuration
     const { data: chatbot, error } = await supabase
       .from("chatbots")
-      .select(`
+      .select(
+        `
         *,
         businesses!inner(
           name,
           website_url,
           user_id
         )
-      `)
+      `
+      )
       .eq("id", chatbotId)
       .eq("is_active", true)
       .single()
@@ -46,7 +51,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const CHATBOT_CONFIG = {
     id: "${chatbot.id}",
     name: "${chatbot.name.replace(/"/g, '\\"')}",
-    welcomeMessage: "${(chatbot.welcome_message || 'Hello! How can I help you today?').replace(/"/g, '\\"')}",
+    welcomeMessage: "${(chatbot.welcome_message || "Hello! How can I help you today?").replace(/"/g, '\\"')}",
     color: "${chatbot.widget_color}",
     position: "${chatbot.widget_position}",
     apiUrl: "${request.nextUrl.origin}"
@@ -65,7 +70,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     generateVisitorId() {
       const stored = localStorage.getItem('chatbot_visitor_id');
       if (stored) return stored;
-      
+
       const id = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
       localStorage.setItem('chatbot_visitor_id', id);
       return id;
@@ -78,7 +83,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     createStyles() {
-      const styles = \\\`
+      const styles = \`
         .chatbot-widget {
           position: fixed !important;
           bottom: 20px !important;
@@ -130,9 +135,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           display: flex !important;
           animation: slideUp 0.3s ease-out;
         }
-        
-        // ... (rest of the styles remain the same)
-      \\\`;
+      \`;
 
       const styleSheet = document.createElement('style');
       styleSheet.textContent = styles;
@@ -142,7 +145,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     createWidget() {
       const widget = document.createElement('div');
       widget.className = 'chatbot-widget';
-      widget.innerHTML = \\\`
+      widget.innerHTML = \`
         <button class="chatbot-button" id="chatbot-toggle">
           <svg viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 2.98.97 4.29L1 23l6.71-1.97C9.02 21.64 10.46 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.4 0-2.7-.3-3.87-.87L7 20l.87-1.13C7.3 17.7 7 16.4 7 15c0-2.76 2.24-5 5-5s5 2.24 5 5-2.24 5-5 5z"/>
@@ -167,13 +170,32 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           </div>
           ${footerHTML}
         </div>
-      \\\`;
+      \`;
 
       document.body.appendChild(widget);
       this.bindEvents();
     }
-    
-    // ... (rest of the class methods remain the same)
+
+    bindEvents() {
+      const toggleButton = document.getElementById('chatbot-toggle');
+      const windowEl = document.getElementById('chatbot-window');
+      const closeButton = document.getElementById('chatbot-close');
+
+      toggleButton.addEventListener('click', () => {
+        windowEl.classList.toggle('open');
+      });
+
+      closeButton.addEventListener('click', () => {
+        windowEl.classList.remove('open');
+      });
+    }
+
+    addWelcomeMessage() {
+      const messagesEl = document.getElementById('chatbot-messages');
+      const msg = document.createElement('div');
+      msg.textContent = this.config.welcomeMessage;
+      messagesEl.appendChild(msg);
+    }
   }
 
   // Initialize the widget
@@ -184,7 +206,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return new NextResponse(widgetScript, {
       headers: {
         "Content-Type": "application/javascript",
-        "Cache-Control": "no-cache", // Use no-cache during debugging
+        "Cache-Control": "no-cache",
       },
     })
   } catch (error) {
@@ -192,3 +214,4 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return new NextResponse("Internal server error", { status: 500 })
   }
 }
+
