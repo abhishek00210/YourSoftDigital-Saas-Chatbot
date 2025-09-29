@@ -22,10 +22,10 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showRepeatPassword, setShowRepeatPassword] = useState(false)
   const router = useRouter()
+  const supabase = createClient()
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
@@ -46,7 +46,6 @@ export default function SignUpPage() {
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
           data: {
             full_name: fullName,
           },
@@ -59,6 +58,15 @@ export default function SignUpPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSignUpWithGoogle = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${location.origin}/auth/callback`,
+      },
+    })
   }
 
   return (
@@ -75,6 +83,14 @@ export default function SignUpPage() {
             <CardDescription>Create a new account to get started</CardDescription>
           </CardHeader>
           <CardContent>
+            <Button variant="outline" className="w-full" onClick={handleSignUpWithGoogle}>
+              Continue with Google
+            </Button>
+            <div className="my-4 flex items-center">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="mx-4 flex-shrink text-sm text-gray-500">OR</span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
             <form onSubmit={handleSignUp}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
