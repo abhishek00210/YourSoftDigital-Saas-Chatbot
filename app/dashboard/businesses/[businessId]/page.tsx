@@ -1,11 +1,15 @@
+// app/dashboard/businesses/[businessId]/page.tsx
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser, getBusinessChatbots } from "@/lib/utils/database"
+import { getUserSubscription } from "@/lib/utils/subscriptions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Bot, Plus, Settings, ExternalLink, Zap } from "lucide-react"
 import Link from "next/link"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { PLAN_LIMITS, PlanName } from "@/lib/config/plans"
 
 interface BusinessPageProps {
   params: Promise<{ businessId: string }>
@@ -33,6 +37,17 @@ export default async function BusinessPage({ params }: BusinessPageProps) {
   }
 
   const chatbots = await getBusinessChatbots(business.id)
+  const { data: subscription } = await getUserSubscription(user.id)
+  const planName = (subscription?.prices?.products?.name as PlanName) || "Free Plan"
+  const planLimits = PLAN_LIMITS[planName]
+  const chatbotLimitReached = chatbots.length >= planLimits.maxChatbots
+
+  const CreateChatbotButton = () => (
+    <Button disabled={chatbotLimitReached}>
+      <Plus className="h-4 w-4 mr-2" />
+      Create Chatbot
+    </Button>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -72,8 +87,10 @@ export default async function BusinessPage({ params }: BusinessPageProps) {
               <Bot className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{chatbots.filter((bot) => bot.is_active).length}</div>
-              <p className="text-xs text-muted-foreground">{chatbots.length} total</p>
+              <div className="text-2xl font-bold">{chatbots.length}</div>
+              <p className="text-xs text-muted-foreground">
+                {planLimits.maxChatbots === Infinity ? "Unlimited" : `out of ${planLimits.maxChatbots}`} on {planName}
+              </p>
             </CardContent>
           </Card>
 
@@ -127,12 +144,24 @@ export default async function BusinessPage({ params }: BusinessPageProps) {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-gray-900">Chatbots</h2>
-            <Link href={`/dashboard/businesses/${business.id}/chatbots/new`}>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Chatbot
-              </Button>
-            </Link>
+            {chatbotLimitReached ? (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-block cursor-not-allowed">
+                      <CreateChatbotButton />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upgrade your plan to create more chatbots.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : (
+              <Link href={`/dashboard/businesses/${business.id}/chatbots/new`}>
+                <CreateChatbotButton />
+              </Link>
+            )}
           </div>
 
           {chatbots.length === 0 ? (
@@ -143,12 +172,30 @@ export default async function BusinessPage({ params }: BusinessPageProps) {
                 <p className="text-gray-600 text-center mb-6 max-w-md">
                   Create your first AI chatbot to start helping customers and boosting sales.
                 </p>
-                <Link href={`/dashboard/businesses/${business.id}/chatbots/new`}>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Chatbot
+                {chatbotLimitReached ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="inline-block cursor-not-allowed">
+                          <Button disabled>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create Your First Chatbot
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Upgrade your plan to create more chatbots.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <Button asChild>
+                    <Link href={`/dashboard/businesses/${business.id}/chatbots/new`}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Your First Chatbot
+                    </Link>
                   </Button>
-                </Link>
+                )}
               </CardContent>
             </Card>
           ) : (
@@ -191,12 +238,30 @@ export default async function BusinessPage({ params }: BusinessPageProps) {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-4">
-              <Link href={`/dashboard/businesses/${business.id}/chatbots/new`}>
-                <Button variant="outline" className="w-full justify-start bg-transparent">
-                  <Bot className="h-4 w-4 mr-2" />
-                  Create New Chatbot
-                </Button>
-              </Link>
+              {chatbotLimitReached ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="inline-block cursor-not-allowed w-full">
+                           <Button variant="outline" className="w-full justify-start bg-transparent" disabled>
+                            <Bot className="h-4 w-4 mr-2" />
+                            Create New Chatbot
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Upgrade your plan to create more chatbots.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
+                    <Link href={`/dashboard/businesses/${business.id}/chatbots/new`}>
+                      <Bot className="h-4 w-4 mr-2" />
+                      Create New Chatbot
+                    </Link>
+                  </Button>
+              )}
               <Link href={`/dashboard/businesses/${business.id}/settings`}>
                 <Button variant="outline" className="w-full justify-start bg-transparent">
                   <Settings className="h-4 w-4 mr-2" />

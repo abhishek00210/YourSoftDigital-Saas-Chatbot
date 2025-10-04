@@ -1,7 +1,7 @@
+// app/dashboard/businesses/[businessId]/chatbots/new/page.tsx
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Bot, Palette } from "lucide-react"
 import Link from "next/link"
+import { PLAN_LIMITS, PlanName } from "@/lib/config/plans"
 
 interface NewChatbotPageProps {
   params: Promise<{ businessId: string }>
@@ -39,8 +40,31 @@ export default function NewChatbotPage({ params }: NewChatbotPageProps) {
     const loadBusiness = async () => {
       const resolvedParams = await params
       setBusinessId(resolvedParams.businessId)
-
       const supabase = createClient()
+
+      // --- ADDED LIMIT CHECK ---
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: subscription } = await supabase
+          .from("subscriptions")
+          .select("*, prices:subscription_prices(*, products:subscription_products(*))")
+          .in("status", ["trialing", "active"])
+          .eq("user_id", user.id)
+          .single();
+
+        const { count: chatbotCount } = await supabase.from('chatbots').select('id', { count: 'exact' }).eq('business_id', resolvedParams.businessId);
+
+        const planName = (subscription?.prices?.products?.name as PlanName) || "Free Plan";
+        const planLimits = PLAN_LIMITS[planName];
+
+        if (chatbotCount !== null && chatbotCount >= planLimits.maxChatbots) {
+          alert("You have reached the maximum number of chatbots for your plan. Please upgrade to create more.");
+          router.push(`/dashboard/businesses/${resolvedParams.businessId}`);
+          return;
+        }
+      }
+      // --- END OF LIMIT CHECK ---
+
       const { data: business, error } = await supabase
         .from("businesses")
         .select("name")

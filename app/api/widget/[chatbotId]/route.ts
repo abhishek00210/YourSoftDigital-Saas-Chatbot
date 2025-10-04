@@ -1,6 +1,8 @@
+// app/api/widget/[chatbotId]/route.ts
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getUserSubscription } from "@/lib/utils/subscriptions"
+import { PLAN_LIMITS, PlanName } from "@/lib/config/plans"
 
 export async function GET(
   request: NextRequest,
@@ -31,14 +33,15 @@ export async function GET(
       return new NextResponse("Chatbot not found or inactive", { status: 404 })
     }
 
-    const userId = chatbot.businesses.user_id
-    const { data: subscription } = await getUserSubscription(userId)
-    const planName = subscription?.prices?.products?.name || "Free"
-    const showBranding = planName !== "Pro"
+    const userId = chatbot.businesses.user_id;
+    const { data: subscription } = await getUserSubscription(userId);
+    const planName = (subscription?.prices?.products?.name as PlanName) || "Free Plan";
+    const planLimits = PLAN_LIMITS[planName];
+    const showBranding = !planLimits.canRemoveBranding;
 
     const footerHTML = showBranding
       ? `<div class="chatbot-footer">
-            Powered by <a href="https://yoursoftdigital.ca/" target="_blank" rel="noopener noreferrer">yoursoftdigital.ca</a>
+            Powered by <a href="https://yoursoftdigital.ca/" target="_blank" rel="noopener noreferrer">YourSoft Digital</a>
           </div>`
       : ""
 
@@ -214,4 +217,3 @@ export async function GET(
     return new NextResponse("Internal server error", { status: 500 })
   }
 }
-
