@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
                     <table width="600" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
                         <tr>
                             <td align="center" style="padding: 20px; background-color: #f1f3f5;">
-                                <h1 style="margin: 0; color: #212529; font-size: 24px; font-weight: bold;">Chat Bot - YourSoft Digital</h1>
+                                <h1 style="margin: 0; color: #212529; font-size: 24px; font-weight: bold;">Chat Bot -YourSoft Digital</h1>
                             </td>
                         </tr>
                         <tr>
