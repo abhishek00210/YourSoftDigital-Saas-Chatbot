@@ -64,7 +64,8 @@ export default function HomePage() {
 
             <Card>
               <CardHeader>
-                <Zap className="h-12 w-12 text-secondary mb-4" />
+                {/* === THIS LINE WAS CHANGED === */}
+                <Zap className="h-12 w-12 text-[#07bc0c] mb-4" />
                 <CardTitle>WooCommerce Sync</CardTitle>
                 <CardDescription>Automatically sync your product catalog and inventory in real-time</CardDescription>
               </CardHeader>
@@ -137,7 +138,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
+      <footer className="bg-[#1E1E2D] text-white py-12 px-4">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
