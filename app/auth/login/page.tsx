@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -50,11 +49,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Sign in to your account</h2>
-          <p className="mt-2 text-sm text-gray-600">Access your chatbot dashboard</p>
+          <h2 className="mt-6 text-3xl font-bold">Sign in to your account</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Access your chatbot dashboard</p>
         </div>
 
         <Card>
@@ -67,9 +66,9 @@ export default function LoginPage() {
               Continue with Google
             </Button>
             <div className="my-4 flex items-center">
-              <div className="flex-grow border-t border-gray-300"></div>
-              <span className="mx-4 flex-shrink text-sm text-gray-500">OR</span>
-              <div className="flex-grow border-t border-gray-300"></div>
+              <div className="flex-grow border-t"></div>
+              <span className="mx-4 flex-shrink text-sm text-muted-foreground">OR</span>
+              <div className="flex-grow border-t"></div>
             </div>
             <form onSubmit={handleLogin}>
               <div className="flex flex-col gap-6">
@@ -89,6 +88,7 @@ export default function LoginPage() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -110,16 +110,16 @@ export default function LoginPage() {
               </div>
               <div className="mt-4 text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <Link href="/auth/sign-up" className="underline underline-offset-4 text-blue-600 hover:text-blue-500">
+                <Link href="/auth/sign-up" className="underline underline-offset-4 text-primary hover:text-primary/80">
                   Sign up
                 </Link>
               </div>
-              <div className="mt-4 text-center text-xs text-gray-500">
+              <div className="mt-4 text-center text-xs text-muted-foreground">
                 <a
                   href="https://yoursoftdigital.ca/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-500 underline"
+                  className="text-primary hover:text-primary/80 underline"
                 >
                   Powered by YourSoftDigital
                 </a>

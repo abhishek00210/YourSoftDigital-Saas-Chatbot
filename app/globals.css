@@ -3,8 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* NEW THEME BASED ON YOUR PROVIDED COLORS
-*/
+/* NEW THEME - v2 with better form contrast */
 :root {
   --background: #F6F7F9; /* --light-background */
   --foreground: #151521; /* --body-font-color */
@@ -23,7 +22,7 @@
   --destructive: #F94C8E; /* --theme-secondary */
   --destructive-foreground: #ffffff;
   --border: rgba(106, 113, 133, 0.4); /* --light-border */
-  --input: #ffffff;
+  --input: #F6F7F9; /* CHANGED: Input fields are now slightly off-white for contrast */
   --ring: #009DB5; /* --theme-default */
   --radius: 0.625rem;
   --chart-1: #009DB5;
@@ -35,23 +34,23 @@
 
 .dark {
   --background: #1d1e26; /* --light-bg in dark-only */
-  --foreground: rgba(255, 255, 255, 0.6); /* --body-font-color in dark-only */
+  --foreground: rgba(255, 255, 255, 0.7); /* --body-font-color in dark-only */
   --card: #262932; /* --white in dark-only */
-  --card-foreground: rgba(255, 255, 255, 0.6);
+  --card-foreground: rgba(255, 255, 255, 0.7);
   --popover: #1d1e26;
-  --popover-foreground: rgba(255, 255, 255, 0.6);
+  --popover-foreground: rgba(255, 255, 255, 0.7);
   --primary: #009DB5;
   --primary-foreground: #ffffff;
   --secondary: #1c1d26; /* --light-slate in dark-only */
-  --secondary-foreground: rgba(255, 255, 255, 0.6);
+  --secondary-foreground: rgba(255, 255, 255, 0.7);
   --muted: #1d1e26;
   --muted-foreground: #85859c; /* --normal-gray in dark-only */
   --accent: #262932; /* --recent-chart-bg */
-  --accent-foreground: rgba(255, 255, 255, 0.6);
+  --accent-foreground: rgba(255, 255, 255, 0.8);
   --destructive: #F94C8E;
   --destructive-foreground: #ffffff;
   --border: #333843; /* --bs-border-color in dark-only */
-  --input: #262932;
+  --input: #1d1e26; /* CHANGED: Input fields are now slightly darker for contrast */
   --ring: #009DB5;
 }
 

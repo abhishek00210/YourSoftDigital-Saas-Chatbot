@@ -5,29 +5,11 @@ import { Bot, Zap, Shield, BarChart3 } from "lucide-react"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="border-b bg-card/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Bot className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">YourSoftDigital</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/auth/login">
-              <Button variant="ghost">Login</Button>
-            </Link>
-            <Link href="/auth/sign-up">
-              <Button>Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
+    <>
       {/* Hero Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-background">
         <div className="container mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6 text-balance">
+          <h1 className="text-5xl font-bold text-foreground mb-6 text-balance">
             AI-Powered Chatbots for Your eCommerce Store
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto text-pretty">
@@ -52,7 +34,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="py-16 px-4 bg-card">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Everything You Need to Succeed</h2>
+          <h2 className="text-3xl font-bold text-center text-foreground mb-12">Everything You Need to Succeed</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card>
               <CardHeader>
@@ -64,7 +46,6 @@ export default function HomePage() {
 
             <Card>
               <CardHeader>
-                {/* === THIS LINE WAS CHANGED === */}
                 <Zap className="h-12 w-12 text-[#07bc0c] mb-4" />
                 <CardTitle>WooCommerce Sync</CardTitle>
                 <CardDescription>Automatically sync your product catalog and inventory in real-time</CardDescription>
@@ -93,7 +74,7 @@ export default function HomePage() {
       {/* How It Works Section */}
       <section className="py-16 px-4 bg-muted/50">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Get Started in Minutes</h2>
+          <h2 className="text-3xl font-bold text-center text-foreground mb-12">Get Started in Minutes</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
@@ -136,98 +117,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-[#1E1E2D] text-white py-12 px-4">
-        <div className="container mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Bot className="h-6 w-6" />
-                <span className="text-lg font-bold">YourSoftDigital</span>
-              </div>
-              <p className="text-gray-400">AI-powered chatbots for eCommerce businesses</p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/features" className="hover:text-white">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/pricing" className="hover:text-white">
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/demo" className="hover:text-white">
-                    Demo
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/docs" className="hover:text-white">
-                    Documentation
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/help" className="hover:text-white">
-                    Help Center
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-white">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/about" className="hover:text-white">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/privacy" className="hover:text-white">
-                    Privacy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="hover:text-white">
-                    Terms
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 YourSoftDigital. All rights reserved.</p>
-            <p className="mt-2">
-              <a
-                href="https://yoursoftdigital.ca/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 underline"
-              >
-                Powered by YourSoftDigital
-              </a>
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </>
   )
 }
