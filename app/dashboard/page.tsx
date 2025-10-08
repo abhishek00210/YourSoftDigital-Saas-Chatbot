@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, Bot, Building2, BarChart3 } from "lucide-react"
 import Link from "next/link"
 
+
 export default async function DashboardPage() {
   const supabase = await createClient()
 
@@ -124,6 +125,8 @@ export default async function DashboardPage() {
                         Manage
                       </Button>
                     </Link>
+               
+
                   </div>
                 </CardContent>
               </Card>

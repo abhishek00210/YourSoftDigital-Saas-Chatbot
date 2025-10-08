@@ -64,7 +64,6 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header is handled by layout */}
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
@@ -75,11 +74,12 @@ export default async function ProductsPage({ params, searchParams }: ProductsPag
                 </Button>
               </Link>
               <div className="flex items-center gap-2">
-                <Package className="h-6 w-6 text-blue-600" />
+                <Package className="h-6 w-6 text-primary" />
                 <h1 className="text-xl font-semibold">Products</h1>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {/* === THIS BUTTON HAS BEEN ADDED === */}
               {hasWooCommerceConfig && <ProductSyncButton businessId={businessId} />}
               <Link href={`/dashboard/businesses/${businessId}/settings`}>
                 <Button variant="outline">

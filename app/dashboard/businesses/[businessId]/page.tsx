@@ -1,27 +1,38 @@
-// app/dashboard/businesses/[businessId]/page.tsx
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import { getCurrentUser, getBusinessChatbots } from "@/lib/utils/database"
-import { getUserSubscription } from "@/lib/utils/subscriptions"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Bot, Plus, Settings, ExternalLink, Zap } from "lucide-react"
-import Link from "next/link"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { PLAN_LIMITS, PlanName } from "@/lib/config/plans"
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser, getBusinessChatbots } from "@/lib/utils/database";
+import { getUserSubscription } from "@/lib/utils/subscriptions";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Bot, Plus, Settings, ExternalLink, Zap } from "lucide-react";
+import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+// Assuming you create this config file
+// import { PLAN_LIMITS, PlanName } from "@/lib/config/plans"; 
+import { ProductSyncButton } from "@/components/products/product-sync-button";
+
+// Define PlanName and PLAN_LIMITS directly if not in a separate file
+type PlanName = "Free Plan" | "Basic Plan" | "Pro Plan";
+
+const PLAN_LIMITS = {
+  "Free Plan": { maxChatbots: 1 },
+  "Basic Plan": { maxChatbots: 3 },
+  "Pro Plan": { maxChatbots: Infinity },
+};
+
 
 interface BusinessPageProps {
-  params: Promise<{ businessId: string }>
+  params: { businessId: string };
 }
 
 export default async function BusinessPage({ params }: BusinessPageProps) {
-  const { businessId } = await params
-  const supabase = await createClient()
+  const { businessId } = params;
+  const supabase = await createClient();
 
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
   if (!user) {
-    redirect("/auth/login")
+    redirect("/auth/login");
   }
 
   // Get business details
@@ -30,17 +41,22 @@ export default async function BusinessPage({ params }: BusinessPageProps) {
     .select("*")
     .eq("id", businessId)
     .eq("user_id", user.id)
-    .single()
+    .single();
 
   if (error || !business) {
-    redirect("/dashboard")
+    redirect("/dashboard");
   }
 
-  const chatbots = await getBusinessChatbots(business.id)
-  const { data: subscription } = await getUserSubscription(user.id)
-  const planName = (subscription?.prices?.products?.name as PlanName) || "Free Plan"
-  const planLimits = PLAN_LIMITS[planName]
-  const chatbotLimitReached = chatbots.length >= planLimits.maxChatbots
+  const chatbots = await getBusinessChatbots(business.id);
+  const hasWooCommerceConfig = !!(
+    business.woocommerce_url &&
+    business.woocommerce_consumer_key &&
+    business.woocommerce_consumer_secret
+  );
+  const { data: subscription } = await getUserSubscription(user.id);
+  const planName = (subscription?.prices?.products?.name as PlanName) || "Free Plan";
+  const planLimits = PLAN_LIMITS[planName];
+  const chatbotLimitReached = chatbots.length >= planLimits.maxChatbots;
 
   const CreateChatbotButton = () => (
     <Button disabled={chatbotLimitReached}>
@@ -67,12 +83,16 @@ export default async function BusinessPage({ params }: BusinessPageProps) {
                 <p className="text-sm text-gray-600">{business.description || "No description"}</p>
               </div>
             </div>
-            <Link href={`/dashboard/businesses/${business.id}/settings`}>
-              <Button variant="outline">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+                {/* === SYNC BUTTON ADDED HERE === */}
+                {hasWooCommerceConfig && <ProductSyncButton businessId={business.id} />}
+                <Link href={`/dashboard/businesses/${business.id}/settings`}>
+                    <Button variant="outline">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Settings
+                    </Button>
+                </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -284,10 +304,10 @@ export default async function BusinessPage({ params }: BusinessPageProps) {
                   </Button>
                 </a>
               )}
-            </div>
+            </div> 
           </CardContent>
         </Card>
       </main>
     </div>
-  )
+  );
 }
